@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>서울시 예술단 & 공연장 상관관계 시각화 (2024)</title>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #f4f7f9;
+      margin: 0;
+      display: flex;
+      flex-direction: row;
+      height: 100vh;
+    }
+    .left {
+      flex: 2;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .right {
+      flex: 1;
+      background: white;
+      padding: 40px;
+      box-shadow: -5px 0 10px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      border-radius: 30px 0 0 30px;
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-size: 1.6rem;
+      color: #222;
+      text-align: center;
+    }
+    #chart {
+      width: 100%;
+      height: 170vh; /* 2배로 확대 */
+    }
+    .card {
+      background: #f9fafc;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .card h3 {
+      margin: 0;
+      color: #0077b6;
+    }
+    .card p {
+      margin: 6px 0 0;
+      color: #555;
+    }
+    footer {
+      text-align: center;
+      font-size: 1rem;
+      color: gray;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="left">
+    <h2>서울시 예술단과 자치구별 공연장</h2>
+    <div id="chart"></div>
+    <footer>2024년</footer>
+  </div>
+  <div class="right">
+    <h2>서울시 주요 예술단 현황</h2>
+    <div class="card">
+      <h3>🎻 서울시립교향악단</h3>
+      <p>단원 수: 99명 | 창단: 1948년</p>
+    </div>
+    <div class="card">
+      <h3>🎶 서울시합창단</h3>
+      <p>단원 수: 79명 | 창단: 1962년</p>
+    </div>
+    <div class="card">
+      <h3>💃 서울시무용단</h3>
+      <p>단원 수: 65명 | 창단: 1974년</p>
+    </div>
+    <div class="card">
+      <h3>🎭 서울시극단</h3>
+      <p>단원 수: 54명 | 창단: 1974년</p>
+    </div>
+    <div class="card">
+      <h3>🎼 서울시청소년국악단</h3>
+      <p>단원 수: 45명 | 창단: 1979년</p>
+    </div>
+  </div>
+
+  <script>
+    const data = [
+      {gu:"종로구", total:161, private:146, small:138},
+      {gu:"중구", total:29, private:16, small:11},
+      {gu:"용산구", total:12, private:10, small:8},
+      {gu:"성동구", total:14, private:11, small:9},
+      {gu:"강남구", total:44, private:35, small:33},
+      {gu:"서초구", total:41, private:29, small:25},
+      {gu:"마포구", total:34, private:28, small:23},
+      {gu:"송파구", total:19, private:14, small:11},
+      {gu:"노원구", total:18, private:12, small:9},
+      {gu:"관악구", total:17, private:12, small:10}
+    ];
+
+    // y축 위치 (우상향) 조정
+    data.forEach((d,i) => {
+      d.artScale = 20 + i*10;
+    });
+
+    // 파스텔 색상
+    const pastelColors = [
+      '#FFD6BA','#FFBCB3','#FFC7A7','#FFDAC1','#E2F0CB',
+      '#B5EAD7','#C7CEEA','#F3C4FB','#FFE7F0','#FEE1A3'
+    ];
+
+    const trace = {
+      x: data.map(d => d.total),
+      y: data.map(d => d.artScale),
+      text: data.map(d => d.gu),
+      mode: 'markers+text',
+      textposition: 'top center',
+      hovertext: data.map(d => `${d.gu}<br>총 공연장: ${d.total}개<br>민간공연장: ${d.private}개<br>소공연장: ${d.small}개`),
+      hoverinfo: 'text',
+      marker: {
+        size: data.map(d => d.total*1.2),
+        color: pastelColors,
+        sizemode: 'area',
+        line: { width: 1, color: '#aaa' }
+      }
+    };
+
+    const layout = {
+      xaxis: { title: "총 공연장 수", range: [0, Math.max(...data.map(d => d.total)) + 20] },
+      yaxis: { title: "공연장 규모", range: [0, 120] },
+      margin: { t: 40, l: 60, r: 30, b: 60 },
+      paper_bgcolor: '#ffffff',
+      plot_bgcolor: '#ffffff',
+      hovermode: "closest",
+      showlegend: false
+    };
+
+    Plotly.newPlot('chart', [trace], layout, {displayModeBar: false});
+  </script>
+</body>
+</html>
